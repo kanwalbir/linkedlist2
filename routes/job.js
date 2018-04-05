@@ -1,62 +1,79 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const { User, Job, Company } = require("../models");
+const { User, Job, Company } = require('../models');
 
-router.get("/", function(req, res, next) {
-  return Job.find().then(allJobs => {
-    return res.render("jobs/index", { allJobs });
+// POSTMAN WORKS
+router
+  .get('/', function(req, res, next) {
+    return Job.find().then(allJobs => {
+      return res.json(allJobs);
+    });
+  })
+
+  //POSTMAN WORKS
+  .post('/', (req, res, next) => {
+    return Job.create(req.body).then(() => {
+      return res.redirect('/jobs');
+    });
   });
+
+// POSTMAN WORKS
+router.get('/new', function(req, res, next) {
+  return res.json('New Jobs it works');
 });
 
-router.get("/new", function(req, res, next) {
-  return res.render("jobs/new");
-});
-
-router.get("/:job_id/edit", function(req, res, next) {
+// POSTMAN WORKS
+router.get('/:job_id/edit', function(req, res, next) {
   return Job.findById(req.params.job_id)
-    .populate("Company")
+    .populate('Company')
     .then(job => {
-      return res.render("jobs/edit", { job });
+      return res.json({ job });
     });
 });
 
 router
-  .get("/:job_id", function(req, res, next) {
+  // POSTMAN WORKS
+  .get('/:job_id', function(req, res, next) {
     return Job.findById(req.params.job_id)
-      .populate("Company")
+      .populate('Company')
       .then(job => {
-        return res.render("jobs", { job });
+        return res.json({ job });
       });
   })
-  .post("/:job_id", function(req, res, next) {
-    return Job.create(req.body).then(() => {
-      return res.redirect("/:job_id");
-    });
-  })
-  .patch("/:job_id", function(req, res, next) {
+  // .post('/:job_id', function(req, res, next) {
+  //   return Job.create(req.body).then(() => {
+  //     return res.redirect('/:job_id');
+  //   });
+  // })
+
+  // POSTMAN WORKS
+  .patch('/:job_id', function(req, res, next) {
     return Job.findByIdAndUpdate(req.params.job_id, req.body).then(() => {
-      return res.redirect("/:job_id");
+      return res.json('/:job_id');
     });
   })
-  .delete("/:job_id", function(req, res, next) {
+  // Will need to update the response, otherwise POSTMAN WORKS
+  .delete('/:job_id', function(req, res, next) {
     return Job.findByIdAndRemove(req.params.job_id).then(() => {
-      return res.redirect("/company/:company_id");
+      return res.redirect('/jobs');
     });
   });
 
-router.get("/:job_id/applicants", function(req, res, next) {
+// POSTMAN WORKS
+router.get('/:job_id/applicants', function(req, res, next) {
   return Job.findById(req.params.job_id)
-    .populate("User")
+    .populate('User')
     .then(job => {
-      return res.render("jobs/applicants", { job });
+      return res.json({ job });
     });
 });
 
-router.get("/:job_id/apply", function(req, res, next) {
+// POSTMAN WORKS
+router.get('/:job_id/apply', function(req, res, next) {
   return Job.findById(req.params.job_id).then(job => {
-    return res.render("jobs/apply", { job });
+    return res.json('hey apply job');
   });
 });
 
