@@ -36,6 +36,10 @@ app.use((req, res) => {
   return res.json('404');
 });
 
+app.use((error, req, res, next) => {
+  return res.json(error.message);
+});
+
 app.listen(port, () => {
   console.log(`listening on port ${port}`);
 });

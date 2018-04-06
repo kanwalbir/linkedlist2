@@ -1,4 +1,7 @@
 const { Company, Inst, Job, Message, Skill, User } = require('../models');
+const Validator = require('jsonschema').Validator;
+const v = new Validator();
+const { createUserSchema } = require('../schemas');
 
 exports.userLogin = (req, res, next) => {
   // session.set(["id"]) = user_id
@@ -16,6 +19,11 @@ exports.showAllUsers = (req, res, next) => {
 };
 
 exports.createNewUser = (req, res, next) => {
+  const userValidation = v.validate(req.body, createUserSchema);
+  if (!userValidation.valid) {
+    const errors = userValidation.errors.map(e => e.stack).join(', ');
+    return next({ message: errors });
+  }
   return User.create(req.body).then(() => {
     return res.redirect('/users');
   });

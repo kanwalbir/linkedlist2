@@ -3,20 +3,22 @@ const router = express.Router();
 //const mongoose = require('mongoose');
 const { companyHandlers } = require('../handlers');
 
-router.get('/login', companyLogin);
+router.get('/login', companyHandlers.companyLogin);
 
-router.get('/signup', companySignUp);
-
-router.get('/', showAllCompanies).post('/', createCompany);
+router.get('/signup', companyHandlers.companySignUp);
 
 router
-  .get('/:company_id', showCompanyFeed)
-  .patch('/:company_id', editCompany)
-  .delete('/:company_id', deleteCompany);
+  .get('/', companyHandlers.showAllCompanies)
+  .post('/', companyHandlers.createCompany);
 
-router.get('/:company_id/edit', renderEditPage);
+router
+  .get('/:company_id', companyHandlers.showCompanyFeed)
+  .patch('/:company_id', companyHandlers.editCompany)
+  .delete('/:company_id', companyHandlers.deleteCompany);
 
-router.get('/:company_id/show', showCompanyProfile);
+router.get('/:company_id/edit', companyHandlers.renderEditPage);
+
+router.get('/:company_id/show', companyHandlers.showCompanyProfile);
 
 // router.get('/:company_id/jobs',function(req,res,next){
 //   return Company.findById(req.params.company_id).populate('Job').then(company =>{

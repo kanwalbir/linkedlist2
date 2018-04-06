@@ -1,4 +1,7 @@
 const { Company, Inst, Job, Message, Skill, User } = require('../models');
+const Validator = require('jsonschema').Validator;
+const v = new Validator();
+const { createCompanySchema } = require('../schemas');
 
 exports.companyLogin = (req, res, next) => {
   return res.json('loginCompany');
@@ -15,6 +18,11 @@ exports.showAllCompanies = (req, res, next) => {
 };
 
 exports.createCompany = (req, res, next) => {
+  const companyValidation = v.validate(req.body, createCompanySchema);
+  if (!companyValidation.valid) {
+    const errors = companyValidation.errors.map(e => e.stack).join(', ');
+    return next({ message: errors });
+  }
   return Company.create(req.body).then(() => {
     return res.redirect('/company');
   });
