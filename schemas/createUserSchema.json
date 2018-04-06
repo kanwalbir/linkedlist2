@@ -1,0 +1,87 @@
+{
+  "$id": "http://localhost:4000/users",
+  "type": "object",
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "properties": {
+    "skills": {
+      "$id": "/properties/skills",
+      "type": "array"
+    },
+    "experience": {
+      "$id": "/properties/experience",
+      "type": "array"
+    },
+    "education": {
+      "$id": "/properties/education",
+      "type": "array"
+    },
+    "jobsApplied": {
+      "$id": "/properties/jobsApplied",
+      "type": "array"
+    },
+    "connection": {
+      "$id": "/properties/connection",
+      "type": "array"
+    },
+    "messages": {
+      "$id": "/properties/messages",
+      "type": "array"
+    },
+    "firstName": {
+      "$id": "/properties/firstName",
+      "type": "string",
+      "title": "The Firstname Schema ",
+      "default": "",
+      "minLength": 1,
+      "maxLength": 55
+    },
+    "lastName": {
+      "$id": "/properties/lastName",
+      "type": "string",
+      "title": "The Lastname Schema ",
+      "default": "",
+      "minLength": 1,
+      "maxLength": 55
+    },
+    "username": {
+      "$id": "/properties/username",
+      "type": "string",
+      "title": "The Username Schema ",
+      "default": "",
+      "minLength": 1,
+      "maxLength": 55
+    },
+    "email": {
+      "$id": "/properties/email",
+      "type": "string",
+      "title": "The Email Schema ",
+      "default": "",
+      "minLength": 1,
+      "maxLength": 55
+    },
+    "password": {
+      "$id": "/properties/password",
+      "type": "string",
+      "title": "The Password Schema ",
+      "default": "",
+      "minLength": 1,
+      "maxLength": 55
+    },
+    "currentCompany": {
+      "$id": "/properties/currentCompany",
+      "type": "string",
+      "title": "The Currentcompany Schema ",
+      "default": "",
+      "minLength": 1,
+      "maxLength": 55
+    },
+    "photo": {
+      "$id": "/properties/photo",
+      "type": "string",
+      "title": "The Photo Schema ",
+      "default": ""
+    }
+  },
+  "required": ["firstName", "lastName", "username", "password", "email"]
+}

@@ -1,0 +1,40 @@
+{
+  "$id": "http://localhost:4000/jobs",
+  "type": "object",
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "properties": {
+    "applicants": {
+      "$id": "/properties/applicants",
+      "type": "array"
+    },
+    "title": {
+      "$id": "/properties/title",
+      "type": "string",
+      "title": "The Title Schema ",
+      "default": "",
+      "minLength": 1,
+      "maxLength": 55
+    },
+    "company": {
+      "$id": "/properties/company",
+      "type": "object"
+    },
+    "content": {
+      "$id": "/properties/content",
+      "type": "string",
+      "title": "The Content Schema "
+    },
+    "salary": {
+      "$id": "/properties/salary",
+      "type": "integer",
+      "title": "The Salary Schema "
+    },
+    "equity": {
+      "$id": "/properties/equity",
+      "type": "integer",
+      "title": "The Equity Schema "
+    }
+  },
+  "required": ["title", "salary", "equity"]
+}
