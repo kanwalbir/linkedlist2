@@ -3,24 +3,26 @@ const router = express.Router();
 //const mongoose = require('mongoose');
 const { userHandlers } = require('../handlers');
 
-router.get('/login', userLogin);
+router.get('/login', userHandlers.userLogin);
 
-router.get('/signup', userSignup);
-
-router.get('/', showAllUsers).post('/', createNewUser);
+router.get('/signup', userHandlers.userSignup);
 
 router
-  .get('/:user_id', displayUser)
-  .patch('/:user_id', updateUser)
-  .delete('/:user_id', deleteUser);
+  .get('/', userHandlers.showAllUsers)
+  .post('/', userHandlers.createNewUser);
 
-router.get('/:user_id/edit', renderUserEditPage);
+router
+  .get('/:user_id', userHandlers.displayUser)
+  .patch('/:user_id', userHandlers.updateUser)
+  .delete('/:user_id', userHandlers.deleteUser);
 
-router.get('/:user_id/messages', userMessages);
+router.get('/:user_id/edit', userHandlers.renderUserEditPage);
 
-router.get('/:user_id/applications', userApplications);
+router.get('/:user_id/messages', userHandlers.userMessages);
+
+router.get('/:user_id/applications', userHandlers.userApplications);
 
 // DRAFT WILL FIX DURING AUTHENTICATION
-router.patch('/:user_id/connect', userConnections);
+router.patch('/:user_id/connect', userHandlers.userConnections);
 
 module.exports = router;
