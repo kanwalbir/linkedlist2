@@ -1,24 +1,25 @@
 //
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const jobSchema = new mongoose.Schema(
   {
-    title: { type: String },
+    title: { type: String, required: true, min: 1, max: 55 },
     company: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Company"
+      ref: 'Company'
     },
-    salary: { type: Number }, //number also covers financial $
-    equity: { type: Number }, //number by default takes care of both floats and integers
+    content: { type: String },
+    salary: { type: Number, required: true }, //number also covers financial $
+    equity: { type: Number, required: true }, //number by default takes care of both floats and integers
     applicants: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+        ref: 'User'
       }
     ]
   },
   { timestamp: true } //creates createdAt and updatedAt
 );
 
-const Job = mongoose.model("Job", jobSchema);
+const Job = mongoose.model('Job', jobSchema);
 module.exports = Job;

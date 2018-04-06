@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
+//const mongoose = require('mongoose');
+const { jobHandlers } = require('../handlers');
 
 const { User, Job, Company } = require('../models');
 

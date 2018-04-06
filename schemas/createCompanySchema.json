@@ -1,0 +1,55 @@
+{
+  "$id": "http://localhost:4000/company",
+  "type": "object",
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "properties": {
+    "employees": {
+      "$id": "/properties/employees",
+      "type": "array"
+    },
+    "jobs": {
+      "$id": "/properties/jobs",
+      "type": "array"
+    },
+    "name": {
+      "$id": "/properties/name",
+      "type": "string",
+      "title": "The Name Schema ",
+      "default": "",
+      "minLength": 1,
+      "maxLength": 55
+    },
+    "email": {
+      "$id": "/properties/email",
+      "type": "string",
+      "title": "The Email Schema ",
+      "default": "",
+      "minLength": 1,
+      "maxLength": 55
+    },
+    "handle": {
+      "$id": "/properties/handle",
+      "type": "string",
+      "title": "The Handle Schema ",
+      "default": "",
+      "minLength": 1,
+      "maxLength": 55
+    },
+    "password": {
+      "$id": "/properties/password",
+      "type": "string",
+      "title": "The Password Schema ",
+      "default": "",
+      "minLength": 1,
+      "maxLength": 55
+    },
+    "logo": {
+      "$id": "/properties/logo",
+      "type": "string",
+      "title": "The Logo Schema ",
+      "default": ""
+    }
+  },
+  "required": ["name", "email", "handle", "password"]
+}
