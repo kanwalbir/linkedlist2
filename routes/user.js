@@ -1,95 +1,26 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
+//const mongoose = require('mongoose');
+const { userHandlers } = require('../handlers');
 
-const { User, Job, Company } = require('../models');
+router.get('/login', userLogin);
 
-//postman works
+router.get('/signup', userSignup);
+
+router.get('/', showAllUsers).post('/', createNewUser);
+
 router
-  .get('/', (req, res, next) => {
-    return User.find().then(users => {
-      return res.json(users);
-    });
-  })
+  .get('/:user_id', displayUser)
+  .patch('/:user_id', updateUser)
+  .delete('/:user_id', deleteUser);
 
-  //postman works
-  .post('/', (req, res, next) => {
-    console.log(req.body);
-    return User.create(req.body).then(() => {
-      return res.redirect('/users');
-    });
-  });
+router.get('/:user_id/edit', renderUserEditPage);
 
-//postman works
-router.get('/login', function(req, res, next) {
-  // session.set(["id"]) = user_id
-  return res.json('userLogin');
-});
+router.get('/:user_id/messages', userMessages);
 
-//postman works
-router.get('/signup', function(req, res, next) {
-  return res.json('userSignup');
-});
-
-//postman works
-router
-  .get('/:user_id', function(req, res, next) {
-    return User.findById(req.params.user_id)
-      .populate('Company', 'Inst', 'Skill')
-      .then(user => {
-        return res.json(user);
-      });
-  })
-
-  //postman works
-  .patch('/:user_id', function(req, res, next) {
-    return User.findByIdAndUpdate(req.params.user_id, req.body).then(user => {
-      return res.redirect(`/users/${user._id}`);
-    });
-  })
-
-  //postman works
-  .delete('/:user_id', function(req, res, next) {
-    return User.findByIdAndRemove(req.params.user_id).then(() => {
-      return res.redirect('/users/login');
-    });
-  });
-
-//postman works
-router.get('/:user_id/edit', function(req, res, next) {
-  return User.findById(req.params.user_id)
-    .populate('Company', 'Inst', 'Skill')
-    .then(user => {
-      return res.json(user);
-    });
-});
-
-//postman works
-router.get('/:user_id/messages', function(req, res, next) {
-  return User.findById(req.params.user_id)
-    .populate('Message')
-    .then(user => {
-      return res.json('userMessage', { user });
-    });
-});
-
-//postman works
-router.get('/:user_id/applications', function(req, res, next) {
-  return User.findById(req.params.user_id)
-    .populate('Job')
-    .then(user => {
-      return res.json('user/listOfApplications', { user });
-    });
-});
+router.get('/:user_id/applications', userApplications);
 
 // DRAFT WILL FIX DURING AUTHENTICATION
-router.patch('/:user_id/connect', function(req, res, next) {
-  let connection = req.params.user_id;
-  return User.findByIdUpdate(session.get(), {
-    $addToSet: { connection: connection }
-  }).then(() => {
-    return res.redirect('/:user_id/show');
-  });
-});
+router.patch('/:user_id/connect', userConnections);
 
 module.exports = router;
