@@ -4,6 +4,7 @@ const v = new Validator();
 const jwt = require("jsonwebtoken");
 const { createUserSchema } = require("../schemas");
 const SECRET = "HACK REACTOR";
+const { ensureCorrectUser } = require("../helpers");
 
 exports.userLogin = (req, res, next) => {
   return res.json("userLogin");
@@ -66,6 +67,17 @@ exports.updateUser = (req, res, next) => {
 };
 
 exports.deleteUser = (req, res, next) => {
+  console.log("entering delete user function");
+  // console.log(User.findById(req.params.user_id));
+  // console.log(req.headers.authorization);
+  let mark = req.headers.authorization;
+  let correctUser = ensureCorrectUser.ensureCorrectUser(
+    mark,
+    req.params.user_id
+  );
+  if (correctUser !== "OK") {
+    return next(correctUser);
+  }
   return User.findByIdAndRemove(req.params.user_id).then(() => {
     return res.redirect("/users/login");
   });

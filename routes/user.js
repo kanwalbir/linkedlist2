@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { authHandlers, userHandlers } = require("../handlers");
+const { authorizeToken } = require("../helpers");
+const { userHandlers } = require("../handlers");
 
 router
   .route("/login")
@@ -16,21 +17,21 @@ router
 
 router
   .route("/:user_id")
-  .get(authHandlers.ensureCorrectUser, userHandlers.displayUser)
-  .patch(authHandlers.ensureCorrectUser, userHandlers.updateUser)
-  .delete(authHandlers.ensureCorrectUser, userHandlers.deleteUser);
+  .get(authorizeToken.authorizeToken, userHandlers.displayUser)
+  .patch(authorizeToken.authorizeToken, userHandlers.updateUser)
+  .delete(authorizeToken.authorizeToken, userHandlers.deleteUser);
 
 router
   .route("/:user_id/edit")
-  .get(authHandlers.ensureCorrectUser, userHandlers.renderUserEditPage);
+  .get(authorizeToken.authorizeToken, userHandlers.renderUserEditPage);
 
 router
   .route("/:user_id/messages")
-  .get(authHandlers.ensureCorrectUser, userHandlers.userMessages);
+  .get(authorizeToken.authorizeToken, userHandlers.userMessages);
 
 router
   .route("/:user_id/applications")
-  .get(authHandlers.ensureCorrectUser, userHandlers.userApplications);
+  .get(authorizeToken.authorizeToken, userHandlers.userApplications);
 
 // DRAFT WILL FIX DURING AUTHENTICATION
 router.route("/:user_id/connect").patch(userHandlers.userConnections);

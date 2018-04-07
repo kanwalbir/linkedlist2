@@ -1,21 +1,21 @@
 const jwt = require("jsonwebtoken");
-const SECRET = "HACK REACTOR";
 
-function ensureCorrectUser(authHeader, correctUser) {
-  const token = authHeader.split(" ")[1];
-
-  if (token) {
-    jwt.verify(token, SECRET, (err, decoded) => {
-      if (err) {
-        return res.json({ message: "Invalid Token" });
-      } else {
-        req.decoded = decoded;
-        return next();
-      }
-    });
-  } else {
-    return res.status(401).json({ message: "No token provided." });
+exports.ensureCorrectUser = (authHeader, max) => {
+  console.log("inside the function correct user");
+  // const queryToken = req.query.token;
+  const headerToken = authHeader;
+  console.log("I need take a shit ", headerToken);
+  const token = headerToken;
+  console.log("this is a damn token ", token);
+  let correctUser = max;
+  try {
+    let username = jwt.verify(token, { json: true }).username;
+    console.log("this is the fuckin ", username);
+  } catch (e) {
+    return e;
   }
-}
-
-module.exports = ensureCorrectUser;
+  if (username !== correctUser) {
+    return "401 Unauthorized, You are not authorized to make changes.";
+  }
+  return "OK";
+};
