@@ -1,21 +1,28 @@
 const jwt = require("jsonwebtoken");
-
-exports.ensureCorrectUser = (authHeader, max) => {
-  console.log("inside the function correct user");
-  // const queryToken = req.query.token;
-  const headerToken = authHeader;
-  console.log("I need take a shit ", headerToken);
-  const token = headerToken;
-  console.log("this is a damn token ", token);
-  let correctUser = max;
-  try {
-    let username = jwt.verify(token, { json: true }).username;
-    console.log("this is the fuckin ", username);
-  } catch (e) {
-    return e;
+const SECRET = "HACK REACTOR";
+exports.ensureCorrectUser = (authHeader, correctUser) => {
+  let decoded = jwt.verify(authHeader, SECRET, { json: true }).username;
+  console.log("BEFORE IF STATEMENT");
+  if (decoded === correctUser) {
+    console.log("INSIDE IF");
+    return "OK";
   }
-  if (username !== correctUser) {
-    return "401 Unauthorized, You are not authorized to make changes.";
-  }
-  return "OK";
+  return "401 Unauthorized, You are not authorized to make changes.";
 };
+
+// CRAP
+// try {
+//   let decoded = jwt.verify(authHeader, SECRET, { json: true }).username;
+//   console.log(authHeader);
+//   console.log(decoded, "/////////////");
+//   console.log("*****************", decoded);
+// } catch (e) {
+//   console.log("THIS IS A CATCH ????????");
+//   return e;
+// }
+// if (decoded !== correctUser) {
+//   console.log("THIS IS AN ERROR ////////////");
+//   return "401 Unauthorized, You are not authorized to make changes.";
+// }
+// console.log("THIS IS WHAT SUCCESS LOOKS LIKE???");
+// return "OK";

@@ -60,25 +60,31 @@ exports.displayUser = (req, res, next) => {
     });
 };
 
-exports.updateUser = (req, res, next) => {
-  return User.findByIdAndUpdate(req.params.user_id, req.body).then(user => {
-    return res.redirect(`/users/${user._id}`);
-  });
-};
-
-exports.deleteUser = (req, res, next) => {
-  console.log("entering delete user function");
-  // console.log(User.findById(req.params.user_id));
-  // console.log(req.headers.authorization);
-  let mark = req.headers.authorization;
+exports.updateUser = function(req, res, next) {
   let correctUser = ensureCorrectUser.ensureCorrectUser(
-    mark,
-    req.params.user_id
+    req.headers.authorization,
+    req.params.username
   );
   if (correctUser !== "OK") {
     return next(correctUser);
   }
-  return User.findByIdAndRemove(req.params.user_id).then(() => {
+  return User.findOneAndUpdate(
+    { username: req.params.username },
+    req.body
+  ).then(user => {
+    return res.redirect(`/users/${user.username}`);
+  });
+};
+
+exports.deleteUser = (req, res, next) => {
+  let correctUser = ensureCorrectUser.ensureCorrectUser(
+    req.headers.authorization,
+    req.params.username
+  );
+  if (correctUser !== "OK") {
+    return next(correctUser);
+  }
+  return User.findOneAndRemove({ username: req.params.username }).then(() => {
     return res.redirect("/users/login");
   });
 };

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const uuidv4 = require("uuid/v4");
+// const uuidv4 = require("uuid/v4");
 const bcrypt = require("bcrypt");
 const SALT_WORK_FACTOR = 10;
 
@@ -79,21 +79,33 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-async function _hashPassword(next) {
-  if (!this.isModified("password")) {
-    return next();
+userSchema.pre("findOneAndUpdate", function(monNext) {
+  const password = this.getUpdate().password;
+  if (!password) {
+    return monNext();
   }
   try {
-    const hashed = await bcrypt.hash(this.password, SALT_WORK_FACTOR);
-    this.password = hashed;
-    return next();
-  } catch (err) {
-    return next(err);
+    const salt = bcrypt.genSaltSync();
+    const hash = bcrypt.hashSync(password, salt);
+    this.getUpdate().password = hash;
+    return monNext();
+  } catch (error) {
+    return next(error);
   }
-}
+});
 
-userSchema.pre("save", _hashPassword);
-userSchema.pre("findOneAndUpdate", _hashPassword);
+userSchema.pre("save", function(monNext) {
+  if (!this.isModified("password")) {
+    return monNext();
+  }
+  return bcrypt
+    .hash(this.password, SALT_WORK_FACTOR)
+    .then(hash => {
+      this.password = hash;
+      return monNext();
+    })
+    .catch(err => next(err));
+});
 
 userSchema.methods.comparePassword = function(userPassword, next) {
   bcrypt.compare(userPassword, this.password, (err, isMatch) => {
