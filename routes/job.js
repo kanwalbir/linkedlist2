@@ -1,25 +1,24 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-
-const { jobHandlers } = require('../handlers');
-
-const { User, Job, Company } = require('../models');
-
-router.get('/', jobHandlers.getAllJobs).post('/', jobHandlers.createJob);
-
-router.get('/new', jobHandlers.newJobForm);
-
-router.get('/:job_id/edit', jobHandlers.editJobForm);
+const { authHandlers, jobHandlers } = require("../handlers");
 
 router
-  .get('/:job_id', jobHandlers.getIndividualJob)
+  .route("/")
+  .get(jobHandlers.getAllJobs)
+  .post(jobHandlers.createJob);
 
-  .patch('/:job_id', jobHandlers.editJob)
+router.route("/new").get(jobHandlers.newJobForm);
 
-  .delete('/:job_id', jobHandlers.deleteJob);
+router.route("/:job_id/edit").get(jobHandlers.editJobForm);
 
-router.get('/:job_id/applicants', jobHandlers.getApplicants);
+router
+  .route("/:job_id")
+  .get(jobHandlers.getIndividualJob)
+  .patch(jobHandlers.editJob)
+  .delete(jobHandlers.deleteJob);
 
-router.get('/:job_id/apply', jobHandlers.applyForJob);
+router.route("/:job_id/applicants").get(jobHandlers.getApplicants);
+
+router.route("/:job_id/apply").get(jobHandlers.applyForJob);
 
 module.exports = router;

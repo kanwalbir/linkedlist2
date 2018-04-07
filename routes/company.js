@@ -1,24 +1,25 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-//const mongoose = require('mongoose');
-const { companyHandlers } = require('../handlers');
+const { companyHandlers } = require("../handlers");
 
-router.get('/login', companyHandlers.companyLogin);
+router.route("/login").get(companyHandlers.companyLogin);
 
-router.get('/signup', companyHandlers.companySignUp);
-
-router
-  .get('/', companyHandlers.showAllCompanies)
-  .post('/', companyHandlers.createCompany);
+router.route("/signup").get(companyHandlers.companySignUp);
 
 router
-  .get('/:company_id', companyHandlers.showCompanyFeed)
-  .patch('/:company_id', companyHandlers.editCompany)
-  .delete('/:company_id', companyHandlers.deleteCompany);
+  .route("/")
+  .get(companyHandlers.showAllCompanies)
+  .post(companyHandlers.createCompany);
 
-router.get('/:company_id/edit', companyHandlers.renderEditPage);
+router
+  .route("/:company_id")
+  .get(companyHandlers.showCompanyFeed)
+  .patch(companyHandlers.editCompany)
+  .delete(companyHandlers.deleteCompany);
 
-router.get('/:company_id/show', companyHandlers.showCompanyProfile);
+router.route("/:company_id/edit").get(companyHandlers.renderEditPage);
+
+router.route("/:company_id/show").get(companyHandlers.showCompanyProfile);
 
 // router.get('/:company_id/jobs',function(req,res,next){
 //   return Company.findById(req.params.company_id).populate('Job').then(company =>{

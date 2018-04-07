@@ -1,4 +1,7 @@
 const mongoose = require("mongoose");
+const uuidv4 = require("uuid/v4");
+const bcrypt = require("bcrypt");
+const SALT_WORK_FACTOR = 10;
 
 const userSchema = new mongoose.Schema(
   {
@@ -75,6 +78,31 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+async function _hashPassword(next) {
+  if (!this.isModified("password")) {
+    return next();
+  }
+  try {
+    const hashed = await bcrypt.hash(this.password, SALT_WORK_FACTOR);
+    this.password = hashed;
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+}
+
+userSchema.pre("save", _hashPassword);
+userSchema.pre("findOneAndUpdate", _hashPassword);
+
+userSchema.methods.comparePassword = function(userPassword, next) {
+  bcrypt.compare(userPassword, this.password, (err, isMatch) => {
+    if (err) {
+      return next(err);
+    }
+    return next(null, isMatch);
+  });
+};
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;

@@ -1,28 +1,38 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-//const mongoose = require('mongoose');
-const { userHandlers } = require('../handlers');
-
-router.get('/login', userHandlers.userLogin);
-
-router.get('/signup', userHandlers.userSignup);
+const { authHandlers, userHandlers } = require("../handlers");
 
 router
-  .get('/', userHandlers.showAllUsers)
-  .post('/', userHandlers.createNewUser);
+  .route("/login")
+  .get(userHandlers.userLogin)
+  .post(userHandlers.userAuthentication);
+
+router.route("/signup").get(userHandlers.userSignup);
 
 router
-  .get('/:user_id', userHandlers.displayUser)
-  .patch('/:user_id', userHandlers.updateUser)
-  .delete('/:user_id', userHandlers.deleteUser);
+  .route("/")
+  .get(userHandlers.showAllUsers)
+  .post(userHandlers.createNewUser);
 
-router.get('/:user_id/edit', userHandlers.renderUserEditPage);
+router
+  .route("/:user_id")
+  .get(authHandlers.ensureCorrectUser, userHandlers.displayUser)
+  .patch(authHandlers.ensureCorrectUser, userHandlers.updateUser)
+  .delete(authHandlers.ensureCorrectUser, userHandlers.deleteUser);
 
-router.get('/:user_id/messages', userHandlers.userMessages);
+router
+  .route("/:user_id/edit")
+  .get(authHandlers.ensureCorrectUser, userHandlers.renderUserEditPage);
 
-router.get('/:user_id/applications', userHandlers.userApplications);
+router
+  .route("/:user_id/messages")
+  .get(authHandlers.ensureCorrectUser, userHandlers.userMessages);
+
+router
+  .route("/:user_id/applications")
+  .get(authHandlers.ensureCorrectUser, userHandlers.userApplications);
 
 // DRAFT WILL FIX DURING AUTHENTICATION
-router.patch('/:user_id/connect', userHandlers.userConnections);
+router.route("/:user_id/connect").patch(userHandlers.userConnections);
 
 module.exports = router;
