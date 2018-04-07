@@ -16,24 +16,24 @@ router
   .post(userHandlers.createNewUser);
 
 router
-  .route("/:user_id")
+  .route("/:username")
   .get(authorizeToken.authorizeToken, userHandlers.displayUser)
   .patch(authorizeToken.authorizeToken, userHandlers.updateUser)
   .delete(authorizeToken.authorizeToken, userHandlers.deleteUser);
 
 router
-  .route("/:user_id/edit")
+  .route("/:username/edit")
   .get(authorizeToken.authorizeToken, userHandlers.renderUserEditPage);
 
 router
-  .route("/:user_id/messages")
+  .route("/:username/messages")
   .get(authorizeToken.authorizeToken, userHandlers.userMessages);
 
 router
-  .route("/:user_id/applications")
+  .route("/:username/applications")
   .get(authorizeToken.authorizeToken, userHandlers.userApplications);
 
 // DRAFT WILL FIX DURING AUTHENTICATION
-router.route("/:user_id/connect").patch(userHandlers.userConnections);
+router.route("/:username/connect").patch(userHandlers.userConnections);
 
 module.exports = router;
