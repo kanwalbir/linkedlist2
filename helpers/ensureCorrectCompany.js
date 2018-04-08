@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
 
-exports.ensureCorrectUser = (authHeader, correctUser) => {
+exports.ensureCorrectCompany = (authHeader, correctCompany) => {
   let decoded = jwt.verify(authHeader, process.env.SECRET_KEY, { json: true })
-    .username;
-  if (decoded === correctUser) {
+    .handle;
+  if (decoded === correctCompany) {
     return 'OK';
   }
   return '401 Unauthorized, You are not authorized to make changes.';

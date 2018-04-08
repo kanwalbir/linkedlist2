@@ -1,7 +1,9 @@
 const { Company, Inst, Job, Message, Skill, User } = require('../models');
 const Validator = require('jsonschema').Validator;
 const v = new Validator();
+const jwt = require('jsonwebtoken');
 const { createCompanySchema } = require('../schemas');
+const { ensureCorrectCompany } = require('../helpers');
 
 exports.companyLogin = (req, res, next) => {
   return res.json('loginCompany');
@@ -9,6 +11,32 @@ exports.companyLogin = (req, res, next) => {
 
 exports.companySignUp = (req, res, next) => {
   return res.json('company signup');
+};
+
+exports.companyAuthentication = (req, res, next) => {
+  return Company.findOne({ handle: req.body.handle }).then(
+    company => {
+      if (!company) {
+        return res.status(401).json({ message: 'Invalid Company you mofo!' });
+      }
+      return company.comparePassword(req.body.password, (err, isMatch) => {
+        if (isMatch) {
+          console.log('secretkey:', process.env.SECRET_KEY);
+          const token = jwt.sign(
+            { company: company.handle },
+            process.env.SECRET_KEY,
+            {
+              expiresIn: 60 * 60
+            }
+          );
+          return res.json({ message: 'Authenticated!', token });
+        } else {
+          return res.status(401).json({ message: 'Invalid Password' });
+        }
+      });
+    },
+    err => next(err)
+  );
 };
 
 exports.showAllCompanies = (req, res, next) => {
@@ -37,16 +65,35 @@ exports.showCompanyFeed = (req, res, next) => {
 };
 
 exports.editCompany = (req, res, next) => {
-  return Company.findByIdAndUpdate(req.params.company_id, req.body).then(
+  let correctCompany = ensureCorrectCompany.ensureCorrectCompany(
+    req.headers.authorization,
+    req.params.handle
+  );
+  if (correctUser !== 'OK') {
+    return next(correctUser);
+  }
+  return Company.findOneAndUpdate({ handle: req.params.handle }, req.body).then(
     company => {
-      console.log('WE MADE IT MAX!!!');
-      return res.redirect(`/company/${company._id}`);
+      return res.redirect(`/company/${company.handle}`);
     }
   );
 };
 
+// exports.deleteCompany = (req, res, next) => {
+//   return Company.findByIdAndRemove(req.params.company_id).then(company => {
+//     return res.redirect('/company/login');
+//   });
+// };
+
 exports.deleteCompany = (req, res, next) => {
-  return Company.findByIdAndRemove(req.params.company_id).then(company => {
+  let correctCompany = ensureCorrectCompany.ensureCorrectCompany(
+    req.headers.authorization,
+    req.params.handle
+  );
+  if (correctCompany !== 'OK') {
+    return next(correctCompany);
+  }
+  return Company.findOneAndRemove({ handle: req.params.handle }).then(() => {
     return res.redirect('/company/login');
   });
 };

@@ -1,6 +1,5 @@
-const mongoose = require("mongoose");
-// const uuidv4 = require("uuid/v4");
-const bcrypt = require("bcrypt");
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 const SALT_WORK_FACTOR = 10;
 
 const userSchema = new mongoose.Schema(
@@ -29,7 +28,7 @@ const userSchema = new mongoose.Schema(
         jobTitle: { type: String },
         company: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "Company"
+          ref: 'Company'
         },
         startDate: { type: Date },
         endDate: { type: Date, default: Date.now }
@@ -39,7 +38,7 @@ const userSchema = new mongoose.Schema(
       {
         institution: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "Inst"
+          ref: 'Inst'
         },
         degree: String,
         endDate: { type: Date }
@@ -48,14 +47,14 @@ const userSchema = new mongoose.Schema(
     skills: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Skill"
+        ref: 'Skill'
       }
     ],
     jobsApplied: [
       {
         jobId: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "Job"
+          ref: 'Job'
         }
       }
     ],
@@ -63,7 +62,7 @@ const userSchema = new mongoose.Schema(
       {
         userId: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "User"
+          ref: 'User'
         }
       }
     ],
@@ -71,7 +70,7 @@ const userSchema = new mongoose.Schema(
       {
         messageId: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "Message"
+          ref: 'Message'
         }
       }
     ]
@@ -79,7 +78,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-userSchema.pre("findOneAndUpdate", function(monNext) {
+userSchema.pre('findOneAndUpdate', function(monNext) {
   const password = this.getUpdate().password;
   if (!password) {
     return monNext();
@@ -94,8 +93,8 @@ userSchema.pre("findOneAndUpdate", function(monNext) {
   }
 });
 
-userSchema.pre("save", function(monNext) {
-  if (!this.isModified("password")) {
+userSchema.pre('save', function(monNext) {
+  if (!this.isModified('password')) {
     return monNext();
   }
   return bcrypt
@@ -116,5 +115,5 @@ userSchema.methods.comparePassword = function(userPassword, next) {
   });
 };
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model('User', userSchema);
 module.exports = User;
