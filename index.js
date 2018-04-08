@@ -6,6 +6,7 @@ const { companyRouter, jobRouter, userRouter } = require('./routes');
 const { User, Job, Company } = require('./models');
 const app = express();
 let port = 4000;
+require('dotenv').config();
 
 app.use(bodyParse.json());
 app.use(morgan('dev'));
