@@ -69,8 +69,8 @@ exports.editCompany = (req, res, next) => {
     req.headers.authorization,
     req.params.handle
   );
-  if (correctUser !== 'OK') {
-    return next(correctUser);
+  if (correctCompany !== 'OK') {
+    return next(correctCompany);
   }
   return Company.findOneAndUpdate({ handle: req.params.handle }, req.body).then(
     company => {

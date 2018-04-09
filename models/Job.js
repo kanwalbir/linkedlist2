@@ -21,5 +21,7 @@ const jobSchema = new mongoose.Schema(
   { timestamp: true } //creates createdAt and updatedAt
 );
 
+// jobSchemas;
+
 const Job = mongoose.model('Job', jobSchema);
 module.exports = Job;

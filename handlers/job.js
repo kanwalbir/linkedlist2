@@ -2,6 +2,8 @@ const { Company, Inst, Job, Message, Skill, User } = require('../models');
 const Validator = require('jsonschema').Validator;
 const v = new Validator();
 const { createJobSchema } = require('../schemas');
+const { ensureUserExists, ensureHandleExists } = require('../helpers');
+const jwt = require('jsonwebtoken');
 
 exports.getAllJobs = (req, res, next) => {
   return Job.find().then(allJobs => {
@@ -10,13 +12,28 @@ exports.getAllJobs = (req, res, next) => {
 };
 
 exports.createJob = (req, res, next) => {
-  const jobValidation = v.validate(req.body, createJobSchema);
-  if (!jobValidation.valid) {
-    const errors = jobValidation.errors.map(e => e.stack).join(',');
-    return next({ message: errors });
+  console.log('WTF ', req.headers.authorization);
+  const handleExists = ensureHandleExists.ensureHandleExists(
+    req.headers.authorization
+  );
+  // const jobValidation = v.validate(req.body, createJobSchema);
+  // if (!jobValidation.valid) {
+  //   const errors = jobValidation.errors.map(e => e.stack).join(',');
+  //   return next({ message: errors });
+  // }
+  if (handleExists[0] !== true) {
+    return next(handleExists);
   }
-  return Job.create(req.body).then(() => {
-    return res.redirect('/jobs');
+  return Job.create(req.body).then(job => {
+    return Company.findOneAndUpdate(handleExists[1], {
+      $addToSet: { jobs: job.id }
+    }).then(company => {
+      return Job.findByIdAndUpdate(job.id, {
+        $addToSet: { company: company.id }
+      }).then(() => {
+        return res.json('hello sunny');
+      });
+    });
   });
 };
 
