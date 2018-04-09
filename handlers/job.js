@@ -2,7 +2,12 @@ const { Company, Inst, Job, Message, Skill, User } = require('../models');
 const Validator = require('jsonschema').Validator;
 const v = new Validator();
 const { createJobSchema } = require('../schemas');
-const { ensureUserExists, ensureHandleExists } = require('../helpers');
+const {
+  ensureUserExists,
+  ensureHandleExists,
+  ensureCorrectCompany,
+  asyncCompany
+} = require('../helpers');
 const jwt = require('jsonwebtoken');
 
 exports.getAllJobs = (req, res, next) => {
@@ -64,9 +69,27 @@ exports.editJob = (req, res, next) => {
 };
 
 exports.deleteJob = (req, res, next) => {
-  return Job.findByIdAndRemove(req.params.job_id).then(() => {
-    return res.redirect('/jobs');
-  });
+  let sunny = req.params.jobId;
+  console.log(req.params);
+  let mark = asyncCompany.findCompany(sunny);
+
+  console.log(mark);
+  const correctCompany = ensureCorrectCompany.ensureCorrectCompany(
+    req.headers.authorization,
+    mark[1]
+  );
+  if (correctCompany !== 'OK') {
+    console.log('SOMETHING IS FUCKED');
+    return next(correctCompany);
+  }
+  console.log('ENTERING REMOVE');
+  return Job.findById(req.params.jobId)
+    .then(job => {
+      return job.remove();
+    })
+    .then(() => {
+      return res.redirect('/');
+    });
 };
 
 exports.getApplicants = (req, res, next) => {
