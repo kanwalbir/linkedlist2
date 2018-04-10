@@ -2,6 +2,13 @@ const { Company, Inst, Job, Message, Skill, User } = require('../models');
 const Validator = require('jsonschema').Validator;
 const v = new Validator();
 const { createJobSchema } = require('../schemas');
+const {
+  ensureUserExists,
+  ensureHandleExists,
+  ensureCorrectCompany,
+  asyncCompany
+} = require('../helpers');
+const jwt = require('jsonwebtoken');
 
 exports.getAllJobs = (req, res, next) => {
   return Job.find().then(allJobs => {
@@ -12,16 +19,32 @@ exports.getAllJobs = (req, res, next) => {
 exports.createJob = (req, res, next) => {
   const jobValidation = v.validate(req.body, createJobSchema);
   if (!jobValidation.valid) {
-    const errors = jobValidation.errors.map(e => e.stack).join(',');
+    const errors = jobValidation.errors.map(e => e.stack).join(', ');
     return next({ message: errors });
   }
-  return Job.create(req.body).then(() => {
-    return res.redirect('/jobs');
+
+  const handleExists = ensureHandleExists.ensureHandleExists(
+    req.headers.authorization
+  );
+
+  if (handleExists[0] !== true) {
+    return next({ message: handleExists[1] });
+  }
+  return Job.create(req.body).then(job => {
+    return Company.findOneAndUpdate(handleExists[1], {
+      $addToSet: { jobs: job.id }
+    }).then(company => {
+      return Job.findByIdAndUpdate(job.id, {
+        $addToSet: { company: company.id }
+      }).then(() => {
+        return res.redirect('/jobs');
+      });
+    });
   });
 };
 
 exports.newJobForm = (req, res, next) => {
-  return res.json('New Jobs it works');
+  return res.json('New Jobs Form');
 };
 
 exports.editJobForm = (req, res, next) => {
@@ -41,15 +64,39 @@ exports.getIndividualJob = (req, res, next) => {
 };
 
 exports.editJob = (req, res, next) => {
-  return Job.findByIdAndUpdate(req.params.job_id, req.body).then(() => {
+  let jobId = req.params.jobId;
+  let companyHandle = asyncCompany.findCompany(jobId);
+  console.log('ouside aysnc', companyHandle);
+  const correctCompany = ensureCorrectCompany.ensureCorrectCompany(
+    req.headers.authorization,
+    companyHandle
+  );
+  if (correctCompany !== 'OK') {
+    return next({ message: correctCompany });
+  }
+  return Job.findByIdAndUpdate(req.params.jobId, req.body).then(() => {
     return res.json('/:job_id');
   });
 };
 
 exports.deleteJob = (req, res, next) => {
-  return Job.findByIdAndRemove(req.params.job_id).then(() => {
-    return res.redirect('/jobs');
-  });
+  let jobId = req.params.jobId;
+  let companyHandle = asyncCompany.findCompany(jobId);
+  const correctCompany = ensureCorrectCompany.ensureCorrectCompany(
+    req.headers.authorization,
+    companyHandle
+  );
+
+  if (correctCompany !== 'OK') {
+    return next(correctCompany);
+  }
+  return Job.findById(req.params.jobId)
+    .then(job => {
+      return job.remove();
+    })
+    .then(() => {
+      return res.redirect('/jobs');
+    });
 };
 
 exports.getApplicants = (req, res, next) => {

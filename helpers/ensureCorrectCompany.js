@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 exports.ensureCorrectCompany = (authHeader, correctCompany) => {
   let decoded = jwt.verify(authHeader, process.env.SECRET_KEY, { json: true })
     .handle;
+  console.log('this is max ', decoded);
   if (decoded === correctCompany) {
     return 'OK';
   }
