@@ -1,23 +1,9 @@
-const { Job } = require('../models');
+const { Job, Company } = require("../models");
 
-// exports.findCompany = async function(jobId) {
-//   return await Job.findById(jobId)
-//     .populate('Company')
-//     .exec()
-//     .then(company => {
-//       console.log('inside async', company);
-//       console.log('inside async', company.handle);
-//       return company.handle;
-//     });
-// };
+exports.findCompanyId = async function(jobId) {
+  return await Job.findById(jobId).then(job => job.company);
+};
 
-exports.findCompany = function(jobId) {
-  return await Job.findById(jobId)
-    .populate('Company')
-    .exec()
-    .then(company => {
-      console.log('inside async', company);
-      console.log('inside async', company.handle);
-      return company.handle;
-    });
+exports.findCompanyHandle = async function(companyId) {
+  return await Company.findById(companyId).then(company => company.handle);
 };

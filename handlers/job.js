@@ -1,14 +1,14 @@
-const { Company, Inst, Job, Message, Skill, User } = require('../models');
-const Validator = require('jsonschema').Validator;
+const { Company, Inst, Job, Message, Skill, User } = require("../models");
+const Validator = require("jsonschema").Validator;
 const v = new Validator();
-const { createJobSchema } = require('../schemas');
+const { createJobSchema } = require("../schemas");
 const {
   ensureUserExists,
   ensureHandleExists,
   ensureCorrectCompany,
   asyncCompany
-} = require('../helpers');
-const jwt = require('jsonwebtoken');
+} = require("../helpers");
+const jwt = require("jsonwebtoken");
 
 exports.getAllJobs = (req, res, next) => {
   return Job.find().then(allJobs => {
@@ -19,7 +19,7 @@ exports.getAllJobs = (req, res, next) => {
 exports.createJob = (req, res, next) => {
   const jobValidation = v.validate(req.body, createJobSchema);
   if (!jobValidation.valid) {
-    const errors = jobValidation.errors.map(e => e.stack).join(', ');
+    const errors = jobValidation.errors.map(e => e.stack).join(", ");
     return next({ message: errors });
   }
 
@@ -37,19 +37,19 @@ exports.createJob = (req, res, next) => {
       return Job.findByIdAndUpdate(job.id, {
         $addToSet: { company: company.id }
       }).then(() => {
-        return res.redirect('/jobs');
+        return res.redirect("/jobs");
       });
     });
   });
 };
 
 exports.newJobForm = (req, res, next) => {
-  return res.json('New Jobs Form');
+  return res.json("New Jobs Form");
 };
 
 exports.editJobForm = (req, res, next) => {
   return Job.findById(req.params.job_id)
-    .populate('Company')
+    .populate("Company")
     .then(job => {
       return res.json({ job });
     });
@@ -57,37 +57,37 @@ exports.editJobForm = (req, res, next) => {
 
 exports.getIndividualJob = (req, res, next) => {
   return Job.findById(req.params.job_id)
-    .populate('Company')
+    .populate("Company")
     .then(job => {
       return res.json({ job });
     });
 };
 
-exports.editJob = (req, res, next) => {
-  let jobId = req.params.jobId;
-  let companyHandle = asyncCompany.findCompany(jobId);
-  console.log('ouside aysnc', companyHandle);
+exports.editJob = async (req, res, next) => {
+  let companyId = await asyncCompany.findCompanyId(req.params.jobId);
+  let companyHandle = await asyncCompany.findCompanyHandle(companyId);
   const correctCompany = ensureCorrectCompany.ensureCorrectCompany(
     req.headers.authorization,
     companyHandle
   );
-  if (correctCompany !== 'OK') {
+  if (correctCompany !== "OK") {
     return next({ message: correctCompany });
   }
   return Job.findByIdAndUpdate(req.params.jobId, req.body).then(() => {
-    return res.json('/:job_id');
+    return res.redirect("/jobs");
   });
 };
 
-exports.deleteJob = (req, res, next) => {
-  let jobId = req.params.jobId;
-  let companyHandle = asyncCompany.findCompany(jobId);
+exports.deleteJob = async (req, res, next) => {
+  let companyId = await asyncCompany.findCompanyId(req.params.jobId);
+  let companyHandle = await asyncCompany.findCompanyHandle(companyId);
+
   const correctCompany = ensureCorrectCompany.ensureCorrectCompany(
     req.headers.authorization,
     companyHandle
   );
 
-  if (correctCompany !== 'OK') {
+  if (correctCompany !== "OK") {
     return next(correctCompany);
   }
   return Job.findById(req.params.jobId)
@@ -95,13 +95,13 @@ exports.deleteJob = (req, res, next) => {
       return job.remove();
     })
     .then(() => {
-      return res.redirect('/jobs');
+      return res.redirect("/jobs");
     });
 };
 
 exports.getApplicants = (req, res, next) => {
   return Job.findById(req.params.job_id)
-    .populate('User')
+    .populate("User")
     .then(job => {
       return res.json({ job });
     });
@@ -109,6 +109,6 @@ exports.getApplicants = (req, res, next) => {
 
 exports.applyForJob = (req, res, next) => {
   return Job.findById(req.params.job_id).then(job => {
-    return res.json('hey apply job');
+    return res.json("hey apply job");
   });
 };
