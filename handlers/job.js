@@ -17,17 +17,18 @@ exports.getAllJobs = (req, res, next) => {
 };
 
 exports.createJob = (req, res, next) => {
-  console.log('WTF ', req.headers.authorization);
+  const jobValidation = v.validate(req.body, createJobSchema);
+  if (!jobValidation.valid) {
+    const errors = jobValidation.errors.map(e => e.stack).join(', ');
+    return next({ message: errors });
+  }
+
   const handleExists = ensureHandleExists.ensureHandleExists(
     req.headers.authorization
   );
-  // const jobValidation = v.validate(req.body, createJobSchema);
-  // if (!jobValidation.valid) {
-  //   const errors = jobValidation.errors.map(e => e.stack).join(',');
-  //   return next({ message: errors });
-  // }
+
   if (handleExists[0] !== true) {
-    return next(handleExists);
+    return next({ message: handleExists[1] });
   }
   return Job.create(req.body).then(job => {
     return Company.findOneAndUpdate(handleExists[1], {
@@ -36,14 +37,14 @@ exports.createJob = (req, res, next) => {
       return Job.findByIdAndUpdate(job.id, {
         $addToSet: { company: company.id }
       }).then(() => {
-        return res.json('hello sunny');
+        return res.redirect('/jobs');
       });
     });
   });
 };
 
 exports.newJobForm = (req, res, next) => {
-  return res.json('New Jobs it works');
+  return res.json('New Jobs Form');
 };
 
 exports.editJobForm = (req, res, next) => {
@@ -63,32 +64,38 @@ exports.getIndividualJob = (req, res, next) => {
 };
 
 exports.editJob = (req, res, next) => {
-  return Job.findByIdAndUpdate(req.params.job_id, req.body).then(() => {
+  let jobId = req.params.jobId;
+  let companyHandle = asyncCompany.findCompany(jobId);
+  console.log('ouside aysnc', companyHandle);
+  const correctCompany = ensureCorrectCompany.ensureCorrectCompany(
+    req.headers.authorization,
+    companyHandle
+  );
+  if (correctCompany !== 'OK') {
+    return next({ message: correctCompany });
+  }
+  return Job.findByIdAndUpdate(req.params.jobId, req.body).then(() => {
     return res.json('/:job_id');
   });
 };
 
 exports.deleteJob = (req, res, next) => {
-  let sunny = req.params.jobId;
-  console.log(req.params);
-  let mark = asyncCompany.findCompany(sunny);
-
-  console.log(mark);
+  let jobId = req.params.jobId;
+  let companyHandle = asyncCompany.findCompany(jobId);
   const correctCompany = ensureCorrectCompany.ensureCorrectCompany(
     req.headers.authorization,
-    mark[1]
+    companyHandle
   );
+
   if (correctCompany !== 'OK') {
-    console.log('SOMETHING IS FUCKED');
     return next(correctCompany);
   }
-  console.log('ENTERING REMOVE');
   return Job.findById(req.params.jobId)
     .then(job => {
       return job.remove();
     })
     .then(() => {
-      return res.redirect('/');
+      return res.redirect('/jobs');
     });
 };
 

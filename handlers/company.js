@@ -21,9 +21,8 @@ exports.companyAuthentication = (req, res, next) => {
       }
       return company.comparePassword(req.body.password, (err, isMatch) => {
         if (isMatch) {
-          console.log('secretkey:', process.env.SECRET_KEY);
           const token = jwt.sign(
-            { company: company.handle },
+            { handle: company.handle },
             process.env.SECRET_KEY,
             {
               expiresIn: 60 * 60
@@ -70,7 +69,7 @@ exports.editCompany = (req, res, next) => {
     req.params.handle
   );
   if (correctCompany !== 'OK') {
-    return next(correctCompany);
+    return next({ message: correctCompany });
   }
   return Company.findOneAndUpdate({ handle: req.params.handle }, req.body).then(
     company => {
@@ -91,7 +90,7 @@ exports.deleteCompany = (req, res, next) => {
     req.params.handle
   );
   if (correctCompany !== 'OK') {
-    return next(correctCompany);
+    return next({ message: correctCompany });
   }
   return Company.findOneAndRemove({ handle: req.params.handle }).then(() => {
     return res.redirect('/company/login');
