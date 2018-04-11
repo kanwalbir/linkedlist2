@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 const SALT_WORK_FACTOR = 10;
 
 const companySchema = new mongoose.Schema(
@@ -12,20 +12,20 @@ const companySchema = new mongoose.Schema(
     employees: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: "User"
       }
     ],
     jobs: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Job'
+        ref: "Job"
       }
     ]
   },
   { timestamps: true }
 );
 
-companySchema.pre('findOneAndUpdate', function(monNext) {
+companySchema.pre("findOneAndUpdate", function(monNext) {
   const password = this.getUpdate().password;
   if (!password) {
     return monNext();
@@ -40,8 +40,8 @@ companySchema.pre('findOneAndUpdate', function(monNext) {
   }
 });
 
-companySchema.pre('save', function(monNext) {
-  if (!this.isModified('password')) {
+companySchema.pre("save", function(monNext) {
+  if (!this.isModified("password")) {
     return monNext();
   }
   return bcrypt
@@ -53,6 +53,13 @@ companySchema.pre('save', function(monNext) {
     .catch(err => next(err));
 });
 
+companySchema.post("findOneAndRemove", async function(company, next) {
+  let Job = mongoose.model("Job");
+  let p = company.jobs.map(val => Job.findByIdAndRemove(val));
+  await Promise.all(p);
+  return next();
+});
+
 companySchema.methods.comparePassword = function(companyPassword, next) {
   bcrypt.compare(companyPassword, this.password, (err, isMatch) => {
     if (err) {
@@ -62,5 +69,5 @@ companySchema.methods.comparePassword = function(companyPassword, next) {
   });
 };
 
-const Company = mongoose.model('Company', companySchema);
+const Company = mongoose.model("Company", companySchema);
 module.exports = Company;
